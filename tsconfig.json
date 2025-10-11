@@ -23,6 +23,7 @@
     "strictTemplates": true
   },
   "files": [],
+  "types": ["ag-grid-community"],
   "references": [
     {
       "path": "./tsconfig.app.json"

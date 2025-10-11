@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  standalone: true,
+  imports: [RouterOutlet, MatToolbarModule],
+  template: `
+    <!-- <mat-toolbar color="primary">LoL Champions</mat-toolbar> -->
+    <router-outlet></router-outlet>
+  `,
 })
-export class App {
-  protected readonly title = signal('lol-champions');
-}
+export class App {}
