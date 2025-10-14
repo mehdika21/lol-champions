@@ -8,8 +8,6 @@ import { ChampionsService } from '../../../core/services/champions';
 import { RouterModule } from '@angular/router';
 import { Champion } from '../../../core/models/champion.model';
 import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 
 @Component({
