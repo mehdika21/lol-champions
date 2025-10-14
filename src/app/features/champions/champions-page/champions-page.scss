@@ -3,6 +3,12 @@
   background: linear-gradient(135deg, #0a1428 0%, #0d1f3c 100%);
   color: #fff;
 }
+.ag-theme-alpine-dark {
+  background-color: #1b1b1b !important;
+  --ag-foreground-color: #eaeaea;
+  --ag-header-background-color: #242424;
+  --ag-row-hover-color: #2d2d2d;
+}
 
 .header-section {
   background: linear-gradient(180deg, rgba(15, 61, 137, 0.6) 0%, rgba(10, 20, 40, 0.3) 100%);
@@ -10,6 +16,17 @@
   padding: 2.5rem 1rem;
   backdrop-filter: blur(10px);
 }
+.custom-dark-grid {
+  --ag-background-color: #1e1e1e; // Dark background
+  --ag-foreground-color: #ffffff; // White text
+  --ag-header-background-color: #2a2a2a;
+  --ag-header-foreground-color: #ffffff;
+  --ag-row-hover-color: #333333;
+  --ag-borders: #3a3a3a;
+  --ag-odd-row-background-color: #242424;
+  --ag-even-row-background-color: #1e1e1e;
+}
+
 
 .header-content {
   max-width: 1400px;

@@ -1,0 +1,78 @@
+// features/summoner-spells/summoner-spells-page/summoner-spells-page.component.ts
+import { Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { AgGridAngular } from 'ag-grid-angular';
+import type { ColDef } from 'ag-grid-community';
+import { SummonerSpellsService } from '../../../core/services/summoner-spells';
+import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
+import { RouterModule } from '@angular/router';
+
+interface SummonerSpell {
+  id: string | number;
+  name: string;
+  key: string;
+  description: string;
+  summonerLevel?: number;
+  [k: string]: any;
+}
+
+@Component({
+  selector: 'app-summoner-spells-page',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, AgGridAngular, HeaderSearchComponent,RouterModule],
+  templateUrl: './summoner-spells-page.html',
+  styleUrls: ['./summoner-spells-page.scss'],
+  encapsulation: ViewEncapsulation.None, // so your theme vars reach the grid
+})
+export class SummonerSpellsPageComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private service = inject(SummonerSpellsService);
+
+  filters = this.fb.nonNullable.group({ q: '' });
+
+  rows = signal<SummonerSpell[]>([]);
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  columns: ColDef[] = [
+    { headerName: 'Name', field: 'name', sortable: true, filter: true, minWidth: 150 },
+    { headerName: 'Key', field: 'key', sortable: true, filter: true, minWidth: 150 },
+    { headerName: 'Level Required', field: 'summonerLevel', sortable: true, filter: true, width: 150 },
+    {
+      headerName: 'Description',
+      field: 'description',
+      sortable: true,
+      filter: true,
+      flex: 1,
+      minWidth: 300,
+      cellRenderer: (p: any) => `<div style="white-space: normal; padding: 6px;">${p.value || 'N/A'}</div>`,
+    },
+  ];
+
+  ngOnInit(): void {
+    this.reload();
+  }
+
+  reload(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    const q = this.filters.controls.q.value;
+    this.service.list(q).subscribe({
+      next: (data) => {
+        this.rows.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load summoner spells:', err);
+        this.error.set('Failed to load summoner spells. Check browser console.');
+        this.rows.set([]);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  onKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter') this.reload();
+  }
+}

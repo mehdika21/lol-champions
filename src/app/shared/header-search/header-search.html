@@ -1,0 +1,42 @@
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <h1>{{ title }}</h1>
+      <p *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+
+    <nav class="header-nav" *ngIf="nav?.length">
+      <a *ngFor="let link of nav"
+         [routerLink]="link.path"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        {{ link.label }}
+      </a>
+    </nav>
+    <div class="page-links">
+        <a routerLink="/champions" routerLinkActive="active">Champions</a>
+        <a routerLink="/games" routerLinkActive="active">Games</a>
+        <a routerLink="/summoner-spells" routerLinkActive="active">Spells</a>
+    </div>
+
+
+    <div class="header-search">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          [formControl]="control"        
+          [placeholder]="placeholder"
+          (keypress)="onKeyPress($event)" />
+
+        <button
+          class="search-button"
+          (click)="submit.emit()"
+          [disabled]="loading">
+          <span *ngIf="!loading">Search</span>
+          <span *ngIf="loading" class="spinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

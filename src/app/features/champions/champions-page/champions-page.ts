@@ -5,7 +5,13 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, Theme } from 'ag-grid-community';
 import { ChampionsService } from '../../../core/services/champions';
+import { RouterModule } from '@angular/router';
 import { Champion } from '../../../core/models/champion.model';
+import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+
+
 @Component({
   selector: 'app-champions-page',
   standalone: true,
@@ -13,6 +19,8 @@ import { Champion } from '../../../core/models/champion.model';
     CommonModule,
     ReactiveFormsModule,
     AgGridAngular,
+    HeaderSearchComponent,
+    RouterModule
   ],
   templateUrl: './champions-page.html',
   styleUrls: ['./champions-page.scss'],

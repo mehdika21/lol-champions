@@ -6,6 +6,7 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+
 html {
   @include mat.theme((
     color: (
@@ -16,6 +17,18 @@ html {
     density: 0,
   ));
 }
+/* Dark LoL-style palette for AG Grid Quartz */
+.ag-theme-quartz.lol-dark {
+  --ag-background-color:#0f1a2b;
+  --ag-foreground-color:#e6eefc;
+  --ag-header-background-color:#14223a;
+  --ag-odd-row-background-color:#122036;
+  --ag-even-row-background-color:#0f1a2b;
+  --ag-row-hover-color:#1a2a46;
+  --ag-selected-row-background-color:#233a61;
+  --ag-border-color:#23304a; // Optional but clean
+}
+
 
 body {
   // Default the application to a light color theme. This can be changed to

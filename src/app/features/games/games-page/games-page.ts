@@ -1,11 +1,141 @@
-import { Component } from '@angular/core';
+// games-page.ts
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, themeQuartz } from 'ag-grid-community';
+import { GamesService } from '../../../core/services/games';
+import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
+
+interface Game {
+  gameId: string;
+  creationTime: number;
+  gameDuration: number;
+  seasonId: number;
+  winner: number;
+  firstBlood: number;
+  firstTower: number;
+  [key: string]: any;
+}
 
 @Component({
   selector: 'app-games-page',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AgGridAngular,
+    HeaderSearchComponent,
+    RouterModule,
+  ],
   templateUrl: './games-page.html',
-  styleUrl: './games-page.scss'
+  styleUrls: ['./games-page.scss'],
 })
-export class GamesPage {
+export class GamesPageComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private service = inject(GamesService);
 
+  filters = this.fb.nonNullable.group({
+    q: '',
+  });
+
+  rows = signal<Game[]>([]);
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+
+
+  columns: ColDef[] = [
+    {
+      headerName: 'Game ID',
+      field: 'gameId',
+      sortable: true,
+      filter: true,
+      minWidth: 150,
+    },
+    {
+      headerName: 'Creation Time',
+      field: 'creationTime',
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: any) => {
+        if (!params.value) return '';
+        return new Date(params.value).toLocaleString();
+      },
+    },
+    {
+      headerName: 'Game Duration (ms)',
+      field: 'gameDuration',
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: any) => {
+        if (!params.value) return '';
+        const minutes = Math.floor(params.value / 60000);
+        const seconds = Math.floor((params.value % 60000) / 1000);
+        return `${minutes}m ${seconds}s`;
+      },
+    },
+    {
+      headerName: 'Season ID',
+      field: 'seasonId',
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: 'Winner',
+      field: 'winner',
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: any) => {
+        return params.value === 1 ? 'Team 1' : 'Team 2';
+      },
+    },
+    {
+      headerName: 'First Blood',
+      field: 'firstBlood',
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: any) => {
+        return params.value === 1 ? 'Team 1' : params.value === 2 ? 'Team 2' : 'N/A';
+      },
+    },
+    {
+      headerName: 'First Tower',
+      field: 'firstTower',
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: any) => {
+        return params.value === 1 ? 'Team 1' : params.value === 2 ? 'Team 2' : 'N/A';
+      },
+    },
+  ];
+
+  ngOnInit(): void {
+    this.reload();
+  }
+
+  reload(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    const q = this.filters.controls.q.value;
+    this.service.list(q).subscribe({
+      next: (data) => {
+        this.rows.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load games:', err);
+        this.error.set('Failed to load games. Check browser console.');
+        this.loading.set(false);
+        this.rows.set([]);
+      },
+    });
+  }
+
+  onKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.reload();
+    }
+  }
 }

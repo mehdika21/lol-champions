@@ -1,24 +1,21 @@
-<!-- games-page.html -->
-<div class="games-container">
+<!-- summoner-spells-page.html -->
+<div class="spells-container">
   <!-- Header -->
-<!-- games-page.html -->
-<app-header-search
-  [title]="'League of Legends'"
-  [subtitle]="'Games Dataset'"
-  [placeholder]="'Search games...'"
-  [loading]="loading()"
-  [control]="filters.controls.q"
-  (submit)="reload()">
-</app-header-search>
-
-
+    <app-header-search
+        [title]="'League of Legends'"
+        [subtitle]="'Summoner Spells Database'"
+        [placeholder]="'Search spells...'"
+        [loading]="loading()"
+        [control]="filters.controls.q"
+        (submit)="reload()">
+    </app-header-search>
   <!-- Main Content -->
   <main class="main-content">
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-item">
         <span class="stat-number">{{ rows().length }}</span>
-        <span class="stat-label">Games Found</span>
+        <span class="stat-label">Spells Found</span>
       </div>
     </div>
 
@@ -29,8 +26,8 @@
 
     <!-- Empty State -->
     <div *ngIf="!loading() && rows().length === 0 && !error()" class="empty-state">
-      <div class="empty-icon">🎮</div>
-      <h3>No Games Found</h3>
+      <div class="empty-icon">✨</div>
+      <h3>No Spells Found</h3>
       <p>Try adjusting your search filters</p>
     </div>
 
@@ -73,7 +70,7 @@
   box-sizing: border-box;
 }
 
-.games-container {
+.spells-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #0a1e3a 0%, #051028 100%);
   color: #fff;
