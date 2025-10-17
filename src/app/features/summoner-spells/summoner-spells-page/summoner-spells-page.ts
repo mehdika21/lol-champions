@@ -7,7 +7,13 @@ import type { ColDef } from 'ag-grid-community';
 import { SummonerSpellsService } from '../../../core/services/summoner-spells';
 import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
 import { RouterModule } from '@angular/router';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 interface SummonerSpell {
   id: string | number;
   name: string;
@@ -20,7 +26,18 @@ interface SummonerSpell {
 @Component({
   selector: 'app-summoner-spells-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AgGridAngular, HeaderSearchComponent,RouterModule],
+  imports: [CommonModule, 
+    ReactiveFormsModule, 
+    AgGridAngular, 
+    HeaderSearchComponent, 
+    RouterModule, 
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,],
   templateUrl: './summoner-spells-page.html',
   styleUrls: ['./summoner-spells-page.scss'],
   encapsulation: ViewEncapsulation.None, // so your theme vars reach the grid
@@ -36,6 +53,27 @@ export class SummonerSpellsPageComponent implements OnInit {
   error = signal<string | null>(null);
 
   columns: ColDef[] = [
+    // 👇 NEW: Icon column first
+    {
+      headerName: 'Icon',
+      field: 'key',
+      width: 80,
+      sortable: false,
+      filter: false,
+      menuTabs: [],
+      cellRenderer: (params: any) => {
+        const key = params.value as string | undefined;
+        if (!key) return '';
+        const alt = (params.data?.name ?? 'Spell').replace(/"/g, '&quot;');
+        const src = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/spell/${key}.png`;
+        return `
+          <img src="${src}"
+               alt="${alt}"
+               title="${alt}"
+               style="width:40px;height:40px;border-radius:6px;display:block;margin:auto;" />
+        `;
+      },
+    },
     { headerName: 'Name', field: 'name', sortable: true, filter: true, minWidth: 150 },
     { headerName: 'Key', field: 'key', sortable: true, filter: true, minWidth: 150 },
     { headerName: 'Level Required', field: 'summonerLevel', sortable: true, filter: true, width: 150 },

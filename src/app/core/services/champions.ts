@@ -1,25 +1,28 @@
-// champions.service.ts
-import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Champion } from '../models/champion.model';
-import { SEED_DB } from '../../app.config';
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ChampionsService {
-  private seed = inject(SEED_DB);
+  private readonly assetsUrl = 'assets/data/champion_info.json';
 
-  list(q?: string): Observable<Champion[]> {
-    let data = this.seed.champions ?? [];
-    
-    if (q) {
-      const query = q.toLowerCase();
-      data = data.filter(c => 
-        `${c.name} ${c.title}`.toLowerCase().includes(query)
-      );
-    }
-    
-    // Simulate HTTP delay for better UX
-    return of(data).pipe(delay(300));
+  constructor(private http: HttpClient) {}
+
+  list(q: string = ''): Observable<any[]> {
+    const query = (q ?? '').toLowerCase();
+    return this.http.get<any>(this.assetsUrl).pipe(
+      map((raw) => {
+        // Adjust this if your JSON shape is different
+        const arr: any[] = raw?.data
+          ? Object.values(raw.data)
+          : Array.isArray(raw) ? raw : [];
+        if (!query) return arr;
+        return arr.filter(c =>
+          (c.name || '').toLowerCase().includes(query) ||
+          (c.key || '').toLowerCase().includes(query)
+        );
+      })
+    );
   }
 }

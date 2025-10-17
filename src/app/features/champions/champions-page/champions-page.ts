@@ -3,12 +3,20 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, Theme } from 'ag-grid-community';
+import { ColDef } from 'ag-grid-community';
 import { ChampionsService } from '../../../core/services/champions';
+import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
 import { RouterModule } from '@angular/router';
 import { Champion } from '../../../core/models/champion.model';
-import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
 
+// Angular Material
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-champions-page',
@@ -16,9 +24,19 @@ import { HeaderSearchComponent } from '../../../shared/header-search/header-sear
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    AgGridAngular,
+    RouterModule,
     HeaderSearchComponent,
-    RouterModule
+    // Grid
+    AgGridAngular,
+
+    // Material
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './champions-page.html',
   styleUrls: ['./champions-page.scss'],
@@ -27,6 +45,7 @@ export class ChampionsPageComponent implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(ChampionsService);
 
+  // Reactive Form (no template-driven controls)
   filters = this.fb.nonNullable.group({
     q: '',
   });
@@ -34,6 +53,7 @@ export class ChampionsPageComponent implements OnInit {
   rows = signal<Champion[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
+
   columns: ColDef[] = [
     {
       headerName: 'Icon',
@@ -41,8 +61,14 @@ export class ChampionsPageComponent implements OnInit {
       width: 80,
       cellRenderer: (params: any) => {
         if (!params.value) return '';
-        return `<img src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${params.value}.png" 
-                    style="width: 50px; height: 50px; border-radius: 4px;" alt="${params.value}">`;
+        const key = params.value;
+        return `
+          <img
+            src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${key}.png"
+            style="width: 40px; height: 40px; border-radius: 6px; display:block; margin:auto;"
+            alt="${key}"
+          />
+        `;
       },
       sortable: false,
       filter: false,
@@ -68,10 +94,9 @@ export class ChampionsPageComponent implements OnInit {
       field: 'tags',
       flex: 1,
       sortable: true,
-      cellRenderer: (params: any) => {
-        if (!Array.isArray(params.value)) return '';
-        return params.value.join(', ');
-      },
+      filter: true,
+      valueFormatter: (p) =>
+        Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? ''),
     },
   ];
 
@@ -82,7 +107,8 @@ export class ChampionsPageComponent implements OnInit {
   reload(): void {
     this.loading.set(true);
     this.error.set(null);
-    const q = this.filters.controls.q.value;
+
+    const q = this.filters.controls.q.value?.trim() ?? '';
     this.service.list(q).subscribe({
       next: (data) => {
         this.rows.set(data);
@@ -91,14 +117,14 @@ export class ChampionsPageComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load champions:', err);
         this.error.set('Failed to load champions. Check browser console.');
-        this.loading.set(false);
         this.rows.set([]);
+        this.loading.set(false);
       },
     });
   }
-  onKeyPress(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.reload();
-    }
+
+  clearSearch(): void {
+    this.filters.controls.q.setValue('');
+    this.reload();
   }
 }

@@ -7,7 +7,13 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, themeQuartz } from 'ag-grid-community';
 import { GamesService } from '../../../core/services/games';
 import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 interface Game {
   gameId: string;
   creationTime: number;
@@ -28,6 +34,13 @@ interface Game {
     AgGridAngular,
     HeaderSearchComponent,
     RouterModule,
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './games-page.html',
   styleUrls: ['./games-page.scss'],

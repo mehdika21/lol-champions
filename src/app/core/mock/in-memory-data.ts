@@ -1,24 +1,29 @@
 import { Injectable, inject } from '@angular/core';
 import { InMemoryDbService, RequestInfo, ResponseOptions } from 'angular-in-memory-web-api';
-import { SEED_DB, SeedDb } from '../../app.config';
+import { SEED_DB, SeedDb } from '../../app.tokens'; // ✅ correct import
 
 @Injectable({ providedIn: 'root' })
 export class InMemoryDataService implements InMemoryDbService {
-  private seed = inject(SEED_DB);
+  private seed = inject<SeedDb>(SEED_DB);
 
   createDb() {
-    return { champions: this.seed.champions ?? [] };
+    return {
+      champions: this.seed.champions,
+      summonerSpells: this.seed.summonerSpells,
+      games: this.seed.games,
+    };
   }
 
-  get(requestInfo: RequestInfo) {
-    if (requestInfo.collectionName === 'champions') {
-      const q = requestInfo.query.get('q')?.[0]?.toLowerCase() ?? '';
-      let data = requestInfo.collection as any[];
-      if (q) data = data.filter(c => `${c.name} ${c.title}`.toLowerCase().includes(q));
+  get(req: RequestInfo) {
+    const name = req.collectionName;
+    if (!['champions', 'summonerSpells', 'games'].includes(name)) return undefined;
 
-      const options: ResponseOptions = { body: data, status: 200 };
-      return requestInfo.utils.createResponse$(() => options);
-    }
-    return undefined;
+    const q = req.query.get('q')?.[0]?.toLowerCase() ?? '';
+    let data = req.collection as any[];
+
+    if (q) data = data.filter(row => JSON.stringify(row).toLowerCase().includes(q));
+
+    const options: ResponseOptions = { body: data, status: 200 };
+    return req.utils.createResponse$(() => options);
   }
 }

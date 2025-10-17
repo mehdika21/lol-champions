@@ -72,13 +72,7 @@
             "key": "SummonerBarrier",
             "description": "Shields your champion from 115-455 damage (depending on champion level) for 2 seconds."
         },
-        "30": {
-            "id": 30,
-            "summonerLevel": 1,
-            "name": "To the King!",
-            "key": "SummonerPoroRecall",
-            "description": "Quickly travel to the Poro King's side."
-        },
+        
         "31": {
             "id": 31,
             "summonerLevel": 1,
@@ -92,34 +86,7 @@
             "name": "Mark",
             "key": "SummonerSnowball",
             "description": "Throw a snowball in a straight line at your enemies. If it hits an enemy, they become marked, granting True Sight, and your champion can quickly travel to the marked target as a follow up."
-        },
-        "33": {
-            "id": 33,
-            "summonerLevel": 1,
-            "name": "Nexus Siege: Siege Weapon Slot",
-            "key": "SummonerSiegeChampSelect1",
-            "description": "In Nexus Siege, Summoner Spells are replaced with Siege Weapon Slots. Spend Crystal Shards to buy single-use Siege Weapons from the item shop, then use your Summoner Spell keys to activate them!"
-        },
-        "34": {
-            "id": 34,
-            "summonerLevel": 1,
-            "name": "Nexus Siege: Siege Weapon Slot",
-            "key": "SummonerSiegeChampSelect2",
-            "description": "In Nexus Siege, Summoner Spells are replaced with Siege Weapon Slots. Spend Crystal Shards to buy single-use Siege Weapons from the item shop, then use your Summoner Spell keys to activate them!"
-        },
-        "35": {
-            "id": 35,
-            "summonerLevel": 1,
-            "name": "Disabled Summoner Spells",
-            "key": "SummonerDarkStarChampSelect1",
-            "description": "Summoner spells are disabled in this mode."
-        },
-        "36": {
-            "id": 36,
-            "summonerLevel": 1,
-            "name": "Disabled Summoner Spells",
-            "key": "SummonerDarkStarChampSelect2",
-            "description": "Summoner spells are disabled in this mode."
         }
+        
     }
 }

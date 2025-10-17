@@ -1,233 +1,61 @@
 <!-- games-page.html -->
 <div class="games-container">
-  <!-- Header -->
-<!-- games-page.html -->
-<app-header-search
-  [title]="'League of Legends'"
-  [subtitle]="'Games Dataset'"
-  [placeholder]="'Search games...'"
-  [loading]="loading()"
-  [control]="filters.controls.q"
-  (submit)="reload()">
-</app-header-search>
 
+  <!-- ✅ Keep your existing header exactly as-is -->
+  <app-header-search
+    [title]="'League of Legends'"
+    [subtitle]="'Games Dataset'"
+    [placeholder]="'Search games...'"
+    [loading]="loading()"
+    [control]="filters.controls.q"
+    (submit)="reload()">
+  </app-header-search>
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-      <div class="stat-item">
-        <span class="stat-number">{{ rows().length }}</span>
-        <span class="stat-label">Games Found</span>
+    <section class="center-col">
+      <!-- ✅ Material Stats Card (same as champions layout) -->
+      <mat-card class="stats-card" appearance="outlined">
+        <div class="stat-item-centered">
+          <span class="stat-number">{{ rows().length }}</span>
+          <span class="stat-label">GAMES FOUND</span>
+        </div>
+      </mat-card>
+
+      <!-- ✅ Error State -->
+      <div *ngIf="error()" class="alert alert-error">
+        <span>⚠️ {{ error() }}</span>
       </div>
-    </div>
 
-    <!-- Error State -->
-    <div *ngIf="error()" class="alert alert-error">
-      <span>⚠️ {{ error() }}</span>
-    </div>
+      <!-- ✅ Empty State -->
+      <div *ngIf="!loading() && rows().length === 0 && !error()" class="empty-state">
+        <div class="empty-icon">🎮</div>
+        <h3>No Games Found</h3>
+        <p>Try adjusting your search filters</p>
+      </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!loading() && rows().length === 0 && !error()" class="empty-state">
-      <div class="empty-icon">🎮</div>
-      <h3>No Games Found</h3>
-      <p>Try adjusting your search filters</p>
-    </div>
+      <!-- ✅ Grid wrapped in Material-style dark panel -->
+      <div *ngIf="rows().length > 0" class="grid-panel">
+        <ag-grid-angular
+          class="grid"
+          [domLayout]="'autoHeight'"
+          [rowData]="rows()"
+          [columnDefs]="columns"
+          [rowHeight]="56"
+          [pagination]="true"
+          [paginationPageSize]="10"
+          [paginationPageSizeSelector]="[10, 15, 20, 50]"
+          [suppressMovableColumns]="true"
+          [animateRows]="true"
+          [suppressHorizontalScroll]="false">
+        </ag-grid-angular>
+      </div>
+    </section>
 
-    <!-- Grid -->
-    <div *ngIf="rows().length > 0" class="grid-container">
-      <ag-grid-angular
-        style="
-          width:100%;
-          --ag-background-color:#151719;
-          --ag-header-background-color:#1b1e22;
-          --ag-odd-row-background-color:#171a1e;
-          --ag-even-row-background-color:#151719;
-          --ag-row-hover-color:#20242a;
-          --ag-selected-row-background-color:#28303a;
-          --ag-foreground-color:#e8eaed;
-          --ag-border-color:#2a2f36;
-          --ag-input-focus-border-color:#6aa0ff;
-          --ag-accent-color:#6aa0ff;
-        "
-        [domLayout]="'autoHeight'"
-        [rowData]="rows()"
-        [columnDefs]="columns"
-        [rowHeight]="56"
-        [pagination]="true"
-        [paginationPageSize]="10"
-        [paginationPageSizeSelector]="[10, 15, 20, 50]"
-        [suppressMovableColumns]="true"
-        [animateRows]="true"
-        [suppressHorizontalScroll]="false">
-      </ag-grid-angular>
+    <!-- ✅ Material Loading Overlay -->
+    <div class="loading-overlay" *ngIf="loading()">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+      <span>Loading games…</span>
     </div>
   </main>
 </div>
-
-<!-- Styles -->
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.games-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a1e3a 0%, #051028 100%);
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-}
-
-
-
-/* Main Content */
-.main-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-/* Stats Bar */
-.stats-bar {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, rgba(0, 157, 255, 0.08) 0%, rgba(0, 100, 200, 0.05) 100%);
-  border: 1px solid rgba(0, 157, 255, 0.15);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #00bfff;
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: #8a9fb3;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 500;
-}
-
-/* Alerts */
-.alert {
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-weight: 500;
-}
-
-.alert-error {
-  background: rgba(255, 89, 0, 0.1);
-  border: 1px solid rgba(255, 89, 0, 0.3);
-  color: #ff9966;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.empty-state h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #8a9fb3;
-}
-
-.empty-state p {
-  color: #5a7a99;
-}
-
-/* Grid Container */
-.grid-container {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-/* AG Grid Theming */
-.grid-container ::ng-deep {
-  .ag-root {
-    border: none;
-    font-family: inherit;
-  }
-
-  .ag-header-cell {
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .ag-cell {
-    display: flex;
-    align-items: center;
-  }
-
-  .ag-row {
-    transition: background-color 0.2s ease;
-  }
-
-  .ag-row:hover {
-    background-color: rgba(209, 64, 129, 0.15) !important;
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .header-inner {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .header-search {
-    max-width: 100%;
-  }
-
-  .header-brand h1 {
-    font-size: 1.5rem;
-  }
-
-  .main-content {
-    padding: 1rem;
-  }
-
-  .stats-bar {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-number {
-    font-size: 2rem;
-  }
-
-  .grid-container {
-    padding: 1rem;
-  }
-}
-</style>
