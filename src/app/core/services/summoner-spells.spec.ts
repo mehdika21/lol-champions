@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SummonerSpells } from './summoner-spells';
+import { SummonerSpellsService } from './summoner-spells';
 
-describe('SummonerSpells', () => {
-  let service: SummonerSpells;
+describe('SummonerSpellsService', () => {
+  let service: SummonerSpellsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SummonerSpells);
+    service = TestBed.inject(SummonerSpellsService);
   });
 
   it('should be created', () => {
