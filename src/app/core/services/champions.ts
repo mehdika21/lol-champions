@@ -5,7 +5,7 @@ import { map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ChampionsService {
-  private readonly assetsUrl = 'assets/data/champion_info.json';
+  private readonly assetsUrl = 'assets/data/champion_info_2.json';
 
   constructor(private http: HttpClient) {}
 
@@ -13,7 +13,6 @@ export class ChampionsService {
     const query = (q ?? '').toLowerCase();
     return this.http.get<any>(this.assetsUrl).pipe(
       map((raw) => {
-        // Adjust this if your JSON shape is different
         const arr: any[] = raw?.data
           ? Object.values(raw.data)
           : Array.isArray(raw) ? raw : [];

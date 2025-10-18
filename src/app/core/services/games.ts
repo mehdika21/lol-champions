@@ -1,32 +1,14 @@
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+// src/app/core/services/games.ts
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GamesService {
-  private readonly assetsUrl = 'assets/data/games.csv';
+  private http = inject(HttpClient);
 
-  constructor(private readonly http: HttpClient) {}
-
-  list(q: string = ''): Observable<any[]> {
-    const query = (q ?? '').toLowerCase();
-    return this.http.get(this.assetsUrl, { responseType: 'text' }).pipe(
-      map(csv => {
-        // Simple CSV parsing (assumes header row)
-        const [headerLine, ...lines] = csv.split(/\r?\n/).filter(l => l.trim());
-        const headers = headerLine.split(',');
-        const arr = lines.map(line => {
-          const values = line.split(',');
-          const obj: any = {};
-          headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
-          return obj;
-        });
-        if (!query) return arr;
-        return arr.filter(g =>
-          Object.values(g).some(v => String(v ?? '').toLowerCase().includes(query))
-        );
-      })
-    );
+  list(q = ''): Observable<any[]> {
+    const params = q ? new HttpParams().set('q', q) : undefined;
+    return this.http.get<any[]>('api/games', { params });
   }
 }

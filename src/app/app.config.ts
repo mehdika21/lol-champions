@@ -8,7 +8,7 @@ import { SeedDataService } from './core/services/seed-data';
 import { SEED_DB } from './app.tokens';
 
 export function seedInitializer(seed: SeedDataService) {
-  return () => seed.loadAll(); // load assets (json/csv) into SEED_DB before app starts
+  return () => seed.loadAll();
 }
 
 export const appConfig: ApplicationConfig = {
@@ -16,22 +16,24 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
 
-    importProvidersFrom(
-      HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
-        apiBase: '/api/',
-        delay: 200,
-        passThruUnknownUrl: true, // let /assets/* load normally
-      })
-    ),
-
-    // ✅ Provide a mutable object; SeedDataService will fill it
+    // Provide mutable seed object
     { provide: SEED_DB, useValue: { champions: [], summonerSpells: [], games: [] } },
 
+    // APP_INITIALIZER must come BEFORE the in-memory API
     {
       provide: APP_INITIALIZER,
       multi: true,
       deps: [SeedDataService],
       useFactory: seedInitializer,
     },
+
+    // In-memory API configuration
+    importProvidersFrom(
+      HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
+        apiBase: 'api/', // Important: avec le slash final
+        delay: 200,
+        passThruUnknownUrl: true,
+      })
+    ),
   ],
 };
