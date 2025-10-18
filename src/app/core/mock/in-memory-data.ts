@@ -33,6 +33,23 @@ export class InMemoryDataService implements InMemoryDbService {
       games: [],
     };
   }
+  delete(req: RequestInfo) {
+    if (req.collectionName !== 'champions') return undefined;
+
+    const idOrKey = String(req.id ?? '');
+    const list = this.seed.champions ?? [];
+    const index = list.findIndex(
+      (item: any) =>
+        String(item.id) === idOrKey || String(item.key) === idOrKey
+    );
+
+    if (index >= 0) list.splice(index, 1);
+
+    return req.utils.createResponse$(() => ({
+      body: {},
+      status: 200
+    }));
+  }
 
   // Override to handle requests properly
   get(req: RequestInfo): any {

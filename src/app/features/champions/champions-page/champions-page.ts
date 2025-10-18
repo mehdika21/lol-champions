@@ -7,9 +7,6 @@ import { ColDef } from 'ag-grid-community';
 import { ChampionsService } from '../../../core/services/champions';
 import { HeaderSearchComponent } from '../../../shared/header-search/header-search';
 import { RouterModule } from '@angular/router';
-import { Champion } from '../../../core/models/champion.model';
-
-// Angular Material
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -50,7 +47,7 @@ export class ChampionsPageComponent implements OnInit {
     q: '',
   });
 
-  rows = signal<Champion[]>([]);
+  rows = signal<ChampionsService[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
 
@@ -98,6 +95,26 @@ export class ChampionsPageComponent implements OnInit {
       valueFormatter: (p) =>
         Array.isArray(p.value) ? p.value.join(', ') : (p.value ?? ''),
     },
+    {
+      headerName: 'Actions',
+      colId: 'actions',
+      width: 110,
+      sortable: false,
+      filter: false,
+      pinned: 'right',
+      cellRenderer: () => `
+        <button class="action-btn delete-btn" style="
+        background: #e53935;
+        border: none;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      " title="Delete">Delete</button>
+      `,
+    },
   ];
 
   ngOnInit(): void {
@@ -126,5 +143,33 @@ export class ChampionsPageComponent implements OnInit {
   clearSearch(): void {
     this.filters.controls.q.setValue('');
     this.reload();
+  }
+  
+ onCellClicked(ev: any): void {
+    if (ev?.column?.getColId() !== 'actions') return;
+
+    const row: any = ev.data;
+    if (!row) return;
+
+    const idOrKey = String(row.id ?? row.key ?? '');
+    if (!idOrKey) return;
+
+    const name = row.name ?? idOrKey;
+    if (!confirm(`Delete champion "${name}"?`)) return;
+
+    this.loading.set(true);
+    this.service.delete(idOrKey).subscribe({
+      next: () => {
+        this.rows.update(list =>
+          list.filter((c: any) => String(c.id ?? c.key ?? '') !== idOrKey)
+        );
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        console.error('Failed to delete champion:', err);
+        this.error.set('Failed to delete champion.');
+        this.loading.set(false);
+      },
+    });
   }
 }

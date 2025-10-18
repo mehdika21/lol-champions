@@ -11,4 +11,4 @@ export class GamesService {
     const params = q ? new HttpParams().set('q', q) : undefined;
     return this.http.get<any[]>('api/games', { params });
   }
-}
+} 

@@ -24,4 +24,7 @@ export class ChampionsService {
       })
     );
   }
+  delete(idOrKey: string): Observable<void> {
+    return this.http.delete<void>(`/api/champions/${encodeURIComponent(idOrKey)}`);
+  }
 }

@@ -78,16 +78,22 @@ export class GamesPageComponent implements OnInit {
       },
     },
     {
-      headerName: 'Game Duration (ms)',
+      headerName: 'Game Duration',
       field: 'gameDuration',
       sortable: true,
       filter: true,
-      cellRenderer: (params: any) => {
-        if (!params.value) return '';
-        const minutes = Math.floor(params.value / 60000);
-        const seconds = Math.floor((params.value % 60000) / 1000);
-        return `${minutes}m ${seconds}s`;
+      cellRenderer: (p: any) => {
+        const raw = Number(p.value);
+        if (!Number.isFinite(raw) || raw <= 0) return '0m 0s';
+
+        // Heuristic: values > 100000 are probably milliseconds
+        const seconds = raw > 100000 ? Math.round(raw / 1000) : Math.round(raw);
+
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}m ${s}s`;
       },
+      minWidth: 160,
     },
     {
       headerName: 'Season ID',
