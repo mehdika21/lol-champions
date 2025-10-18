@@ -86,6 +86,26 @@ export class SummonerSpellsPageComponent implements OnInit {
       minWidth: 300,
       cellRenderer: (p: any) => `<div style="white-space: normal; padding: 6px;">${p.value || 'N/A'}</div>`,
     },
+    {
+      headerName: 'Actions',
+      colId: 'actions',
+      width: 110,
+      sortable: false,
+      filter: false,
+      pinned: 'right',
+      cellRenderer: () => `
+        <button class="action-btn delete-btn" style="
+        background: #e53935;
+        border: none;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      " title="Delete">Delete</button>
+      `,
+    },
   ];
 
   ngOnInit(): void {
@@ -109,7 +129,33 @@ export class SummonerSpellsPageComponent implements OnInit {
       },
     });
   }
+  onCellClicked(ev: any): void {
+      if (ev?.column?.getColId() !== 'actions') return;
 
+      const row: any = ev.data;
+      if (!row) return;
+
+      const idOrKey = String(row.id ?? row.key ?? '');
+      if (!idOrKey) return;
+
+      const name = row.name ?? idOrKey;
+      if (!confirm(`Delete summoner spell "${name}"?`)) return;
+
+      this.loading.set(true);
+      this.service.delete(idOrKey).subscribe({
+        next: () => {
+          this.rows.update(list =>
+            list.filter((c: any) => String(c.id ?? c.key ?? '') !== idOrKey)
+          );
+          this.loading.set(false);
+        },
+        error: (err: any) => {
+          console.error('Failed to delete summoner spell:', err);
+          this.error.set('Failed to delete summoner spell.');
+          this.loading.set(false);
+        },
+      });
+    }
   onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter') this.reload();
   }

@@ -1,6 +1,6 @@
-// core/services/summoner-spells.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+// src/app/core/services/summoner-spells.service.ts
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 export interface SummonerSpell {
@@ -14,37 +14,16 @@ export interface SummonerSpell {
 
 @Injectable({ providedIn: 'root' })
 export class SummonerSpellsService {
-  // 👉 Point directly to your assets JSON (no backend, no interceptor)
-  private readonly assetsUrl = 'assets/data/summoner_spell_info.json';
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
-
+  // ✅ List from the mock API so delete affects the same dataset
   list(q?: string): Observable<SummonerSpell[]> {
-    const query = (q ?? '').toLowerCase();
-
-    return this.http.get<any>(this.assetsUrl).pipe(
-      map((raw) => {
-        // Your file shape is: { type, version, data: { "1": {...}, "3": {...}, ... } }
-        const arr: SummonerSpell[] = raw?.data
-          ? Object.values(raw.data) as SummonerSpell[]
-          : Array.isArray(raw) ? raw as SummonerSpell[] : [];
-
-        if (!query) return arr;
-
-        // simple client-side filter
-        return arr.filter(s =>
-          (s.name || '').toLowerCase().includes(query) ||
-          (s.key || '').toLowerCase().includes(query) ||
-          (s.description || '').toLowerCase().includes(query) ||
-          String(s.summonerLevel ?? '').includes(query)
-        );
-      })
-    );
+    const params = (q && q.trim()) ? new HttpParams().set('q', q) : undefined;
+    return this.http.get<SummonerSpell[]>('/api/summonerSpells', { params });
   }
 
-  // keep API parity if you need it later (no-op for assets)
-  delete(_id: string | number): Observable<void> {
-    // Not applicable when reading from assets; implement against a real API if needed.
-    throw new Error('delete() is not supported when using assets data.');
+  // ✅ Delete from the same collection; note camelCase: summonerSpells
+  delete(idOrKey: string): Observable<void> {
+    return this.http.delete<void>(`/api/summonerSpells/${encodeURIComponent(idOrKey)}`);
   }
 }

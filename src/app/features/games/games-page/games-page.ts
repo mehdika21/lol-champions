@@ -57,8 +57,6 @@ export class GamesPageComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
 
-
-
   columns: ColDef[] = [
     {
       headerName: 'Game ID',
@@ -128,6 +126,26 @@ export class GamesPageComponent implements OnInit {
         return params.value === 1 ? 'Team 1' : params.value === 2 ? 'Team 2' : 'N/A';
       },
     },
+    {
+      headerName: 'Actions',
+      colId: 'actions',
+      width: 110,
+      sortable: false,
+      filter: false,
+      pinned: 'right',
+      cellRenderer: () => `
+        <button class="action-btn delete-btn" style="
+        background: #e53935;
+        border: none;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      " title="Delete">Delete</button>
+      `,
+    },
   ];
 
   ngOnInit(): void {
@@ -148,6 +166,31 @@ export class GamesPageComponent implements OnInit {
         this.error.set('Failed to load games. Check browser console.');
         this.loading.set(false);
         this.rows.set([]);
+      },
+    });
+  }
+  onCellClicked(ev: any): void {
+    if (ev?.column?.getColId() !== 'actions') return;
+
+    const row: any = ev.data;
+    if (!row) return;
+
+    const gameId = String(row.gameId ?? '');
+    if (!gameId) return;
+
+    if (!confirm(`Delete game "${gameId}"?`)) return;
+
+    this.loading.set(true);
+    this.service.delete(gameId).subscribe({
+      next: () => {
+        // remove from local rows by gameId
+        this.rows.update((list) => list.filter((g: any) => String(g.gameId ?? '') !== gameId));
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        console.error('Failed to delete game:', err);
+        this.error.set('Failed to delete game.');
+        this.loading.set(false);
       },
     });
   }

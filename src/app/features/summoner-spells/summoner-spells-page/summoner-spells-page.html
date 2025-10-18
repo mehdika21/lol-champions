@@ -34,23 +34,35 @@
         <p>Try adjusting your search filters</p>
       </div>
 
-      <!-- ✅ Grid wrapped in rounded dark panel -->
-      <div *ngIf="rows().length > 0" class="grid-panel">
-        <ag-grid-angular
-          class="grid"
-          [domLayout]="'autoHeight'"
-          [rowData]="rows()"
-          [columnDefs]="columns"
-          [rowHeight]="56"
-          [pagination]="true"
-          [paginationPageSize]="10"
-          [paginationPageSizeSelector]="[10, 15, 20, 50]"
-          [suppressMovableColumns]="true"
-          [animateRows]="true"
-          [suppressHorizontalScroll]="false">
-        </ag-grid-angular>
-      </div>
+      <ag-grid-angular
+  class="ag-theme-quartz"
+  style="width:100%; min-height: 320px;
+         --ag-background-color:#151719;
+         --ag-header-background-color:#1b1e22;
+         --ag-odd-row-background-color:#171a1e;
+         --ag-even-row-background-color:#151719;
+         --ag-row-hover-color:#20242a;
+         --ag-selected-row-background-color:#28303a;
+         --ag-foreground-color:#e8eaed;
+         --ag-border-color:#2a2f36;
+         --ag-input-focus-border-color:#6aa0ff;
+         --ag-accent-color:#6aa0ff;"
+  [domLayout]="'autoHeight'"
+  [rowData]="rows()"
+  [columnDefs]="columns.slice()"
+  [rowHeight]="56"
+  [pagination]="true"
+  [paginationPageSize]="10"
+  [paginationPageSizeSelector]="[10, 15, 20, 50]"
+  [suppressMovableColumns]="true"
+  [animateRows]="true"
+  [suppressHorizontalScroll]="false"
+  (cellClicked)="onCellClicked($event)">
+</ag-grid-angular>
+
+
     </section>
+
 
     <!-- (Optional) Loading overlay to match other pages -->
     <div class="loading-overlay" *ngIf="loading()">

@@ -47,7 +47,8 @@
           [paginationPageSizeSelector]="[10, 15, 20, 50]"
           [suppressMovableColumns]="true"
           [animateRows]="true"
-          [suppressHorizontalScroll]="false">
+          [suppressHorizontalScroll]="false"
+         (cellClicked)="onCellClicked($event)">
         </ag-grid-angular>
       </div>
     </section>

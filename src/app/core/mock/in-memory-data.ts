@@ -18,7 +18,7 @@ export class InMemoryDataService implements InMemoryDbService {
       console.log(`[InMemoryDB] Passing through asset URL: ${url}`);
       return undefined;
     }
-    
+
     // Use default parsing for everything else
     const parsed = utils.parseRequestUrl(url);
     console.log(`[InMemoryDB] Parsed URL: ${url} → collection: "${parsed?.collectionName}"`);
@@ -34,27 +34,44 @@ export class InMemoryDataService implements InMemoryDbService {
     };
   }
   delete(req: RequestInfo) {
-    if (req.collectionName !== 'champions') return undefined;
+    const name = req.collectionName;
 
-    const idOrKey = String(req.id ?? '');
-    const list = this.seed.champions ?? [];
-    const index = list.findIndex(
-      (item: any) =>
-        String(item.id) === idOrKey || String(item.key) === idOrKey
-    );
+    if (name === 'champions') {
+      const idOrKey = String(req.id ?? '');
+      const arr = this.seed.champions ?? [];
+      const idx = arr.findIndex(
+        (c: any) => String(c.id ?? '') === idOrKey || String(c.key ?? '') === idOrKey
+      );
+      if (idx > -1) arr.splice(idx, 1);
+      return req.utils.createResponse$(() => ({ body: {}, status: 200 }));
+    }
 
-    if (index >= 0) list.splice(index, 1);
+    if (name === 'summonerSpells') {
+      // ✅ NEW
+      const idOrKey = String(req.id ?? '');
+      const arr = this.seed.summonerSpells ?? [];
+      const idx = arr.findIndex(
+        (s: any) => String(s.id ?? '') === idOrKey || String(s.key ?? '') === idOrKey
+      );
+      if (idx > -1) arr.splice(idx, 1);
+      return req.utils.createResponse$(() => ({ body: {}, status: 200 }));
+    }
 
-    return req.utils.createResponse$(() => ({
-      body: {},
-      status: 200
-    }));
+    if (name === 'games') {
+      const gameId = String(req.id ?? '');
+      const arr = this.seed.games ?? [];
+      const idx = arr.findIndex((g: any) => String(g.gameId ?? '') === gameId);
+      if (idx > -1) arr.splice(idx, 1);
+      return req.utils.createResponse$(() => ({ body: {}, status: 200 }));
+    }
+
+    return undefined;
   }
 
   // Override to handle requests properly
   get(req: RequestInfo): any {
     const collectionName = req.collectionName;
-    
+
     console.log(`[InMemoryDB] GET request for collection: "${collectionName}"`);
 
     // Only handle our API collections
@@ -65,7 +82,7 @@ export class InMemoryDataService implements InMemoryDbService {
 
     // Get data from seed
     let data: any[] = [];
-    
+
     switch (collectionName) {
       case 'champions':
         data = this.seed.champions ?? [];
@@ -84,38 +101,35 @@ export class InMemoryDataService implements InMemoryDbService {
     const searchQuery = req.query.get('q')?.[0]?.toLowerCase();
     if (searchQuery) {
       console.log(`[InMemoryDB] Filtering by query: "${searchQuery}"`);
-      data = data.filter((item: any) =>
-        JSON.stringify(item).toLowerCase().includes(searchQuery)
-      );
+      data = data.filter((item: any) => JSON.stringify(item).toLowerCase().includes(searchQuery));
       console.log(`[InMemoryDB] After filtering: ${data.length} items`);
     }
 
     // Ensure data is serializable (no circular references)
     try {
       const cleanData = JSON.parse(JSON.stringify(data));
-      
+
       const response: ResponseOptions = {
         body: cleanData,
         status: STATUS.OK,
         statusText: 'OK',
         headers: req.headers.set('Content-Type', 'application/json'),
-        url: req.url
+        url: req.url,
       };
 
       console.log(`[InMemoryDB] ✅ Returning ${cleanData.length} items`);
       return req.utils.createResponse$(() => response);
-      
     } catch (error) {
       console.error('[InMemoryDB] Error serializing data:', error);
-      
+
       const errorResponse: ResponseOptions = {
         body: { error: 'Failed to serialize data' },
         status: STATUS.INTERNAL_SERVER_ERROR,
         statusText: 'Internal Server Error',
         headers: req.headers.set('Content-Type', 'application/json'),
-        url: req.url
+        url: req.url,
       };
-      
+
       return req.utils.createResponse$(() => errorResponse);
     }
   }
